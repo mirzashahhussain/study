@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Mukta&display=swap");
+
+* {
+  font-family: "Mukta", sans-serif;
+}
+
+.course-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 250px);
+  justify-content: center;
+  align-items: center;
+  grid-gap: 10px;
+}
+
+.display-modal-btn {
+  border: none;
+  border-radius: 5px;
+  margin-top: 5px;
+  background-color: rgb(108, 108, 214);
+  color: aqua;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 5px;
+  width: 5%;
+}

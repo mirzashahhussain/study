@@ -1,0 +1,27 @@
+.form-body {
+  display: block;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.form-body input {
+  display: block;
+  width: 80%;
+  margin-bottom: 5px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-body button {
+  border: none;
+  color: white;
+  margin-left: 5px;
+  margin-top: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 5px;
+  background-color: rgb(123, 123, 230);
+}
