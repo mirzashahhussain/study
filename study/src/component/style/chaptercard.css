@@ -2,12 +2,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid #ccc;
   border-radius: 5px;
   padding: 5px;
   cursor: pointer;
   transition: 0.2s;
   margin-bottom: 5px;
+}
+.chapter-card:hover {
+  border: 1px solid #ccc;
 }
 
 .chapter-name {
@@ -51,7 +53,7 @@
   margin-left: 5px;
   border-radius: 5px;
   cursor: pointer;
-  padding: 10px;
+  padding: auto 5px;
 }
 
 .chapter-card-options button:nth-child(1) {

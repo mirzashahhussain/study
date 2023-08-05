@@ -118,83 +118,88 @@ function QuizCard() {
       <div>
         {showAddQuiz ? (
           <>
-            <div className="add-quiz-form">
-              <div className="add-question">
-                <label>Question:</label>
-                <input
-                  type="text"
-                  value={currentQuestion}
-                  onChange={(e) => setCurrentQuestion(e.target.value)}
-                />
-              </div>
-              <div>
-                <label>Options:</label>
-                <ol>
-                  {options.map((option, index) => (
-                    <li key={index}>
-                      {option}{" "}
-                      {index === editingOptionIndex ? (
-                        <>
-                          <button onClick={handleAddOption}>
-                            <i className="fa-solid fa-check"></i>
-                          </button>
-                          <button onClick={() => setEditingOptionIndex(null)}>
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
-                        <button onClick={() => handleEditOption(index)}>
-                          <i className="fa-solid fa-pen-to-square"></i>
-                        </button>
-                      )}
-                      {correctOption === index && <span>(Correct Option)</span>}
-                    </li>
-                  ))}
-                </ol>
-                <input
-                  type="text"
-                  value={currentOption}
-                  onChange={(e) => setCurrentOption(e.target.value)}
-                />
-                <button onClick={handleAddOption}>
-                  {editingOptionIndex !== null ? "Update Option" : "Add Option"}
-                </button>
-                <div>
-                  <label>Correct Option:</label>
-                  <select
-                    value={correctOption}
-                    onChange={(e) => setCorrectOption(parseInt(e.target.value))}
-                  >
-                    <option value={null}>Select Correct Option</option>
-                    {options.map((_, index) => (
-                      <option key={index} value={index}>
-                        Option {index + 1}
-                      </option>
-                    ))}
-                  </select>
+            <div className="add-course-modal">
+              <div className="add-quiz-form">
+                <div className="add-question">
+                  <label>Question:</label>
+                  <input
+                    type="text"
+                    value={currentQuestion}
+                    onChange={(e) => setCurrentQuestion(e.target.value)}
+                  />
                 </div>
+                <div>
+                  <label>Options:</label>
+                  <ol type="a">
+                    {options.map((option, index) => (
+                      <li key={index}>
+                        {option}{" "}
+                        {index === editingOptionIndex ? (
+                          <>
+                            <button onClick={handleAddOption}>
+                              <i className="fa-solid fa-check"></i>
+                            </button>
+                            <button onClick={() => setEditingOptionIndex(null)}>
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <button onClick={() => handleEditOption(index)}>
+                            <i className="fa-solid fa-pen-to-square"></i>
+                          </button>
+                        )}
+                        {correctOption === index && (
+                          <span>(Correct Option)</span>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                  <input
+                    type="text"
+                    value={currentOption}
+                    onChange={(e) => setCurrentOption(e.target.value)}
+                  />
+                  <button onClick={handleAddOption}>
+                    {editingOptionIndex !== null ? "Update" : "Add"}
+                  </button>
+                  <div>
+                    <label>Correct Option:</label>
+                    <select
+                      value={correctOption}
+                      onChange={(e) =>
+                        setCorrectOption(parseInt(e.target.value))
+                      }
+                    >
+                      <option value={null}>Select Correct Option</option>
+                      {options.map((_, index) => (
+                        <option key={index} value={index}>
+                          Option {index + 1}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label>Marks:</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={marks}
+                    onChange={(e) => setMarks(parseInt(e.target.value))}
+                  />
+                </div>
+                <button onClick={handleAddQuiz}>
+                  {editingQuestionIndex !== null ? "Update " : "Add "}
+                </button>
+                <button onClick={() => setShowAddQuiz(false)}>close</button>
               </div>
-              <div>
-                <label>Marks:</label>
-                <input
-                  type="number"
-                  min={1}
-                  value={marks}
-                  onChange={(e) => setMarks(parseInt(e.target.value))}
-                />
-              </div>
-              <button onClick={handleAddQuiz}>
-                {editingQuestionIndex !== null ? "Update " : "Add "}
-              </button>
-              <button onClick={() => setShowAddQuiz(false)}>close</button>
             </div>
           </>
         ) : (
-          <button onClick={() => setShowAddQuiz(true)}>
+          <button className="add-quiz-btn" onClick={() => setShowAddQuiz(true)}>
             <i className="fa-solid fa-plus"></i>
           </button>
         )}
-
         <div className="add-quiz-body">
           <h2>Added Quizzes</h2>
           {questions.map((question, questionIndex) => (
@@ -204,7 +209,7 @@ function QuizCard() {
                 <p>Marks: {question.marks}</p>
               </p>
 
-              <ul>
+              <ol type="a">
                 {question.options.map((option, optionIndex) => (
                   <li key={optionIndex}>
                     {option}{" "}
@@ -220,12 +225,18 @@ function QuizCard() {
                     )}
                   </li>
                 ))}
-              </ul>
+              </ol>
 
-              <button onClick={() => handleEditQuestion(questionIndex)}>
+              <button
+                className="quiz-btn-style"
+                onClick={() => handleEditQuestion(questionIndex)}
+              >
                 <i className="fa-solid fa-pen-to-square"></i>
               </button>
-              <button onClick={() => handleDeleteQuestion(questionIndex)}>
+              <button
+                className="quiz-btn-style"
+                onClick={() => handleDeleteQuestion(questionIndex)}
+              >
                 <i className="fa-solid fa-trash"></i>
               </button>
             </div>

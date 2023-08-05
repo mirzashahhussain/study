@@ -28,6 +28,7 @@ function ChapterCard(props) {
         {chapterName}
       </h2>
       <h3 className="chapter-length">{chapterLength}</h3>
+      
       {isOpen && (
         <video width="100%" height="auto" controls>
           <source

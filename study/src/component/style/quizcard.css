@@ -2,9 +2,23 @@
   background-color: rgba(240, 248, 255, 0);
   border: none;
   cursor: pointer;
+  color: black;
 }
 .add-quiz-body button {
   background-color: rgba(240, 248, 255, 0);
   border: none;
+  cursor: pointer;
+}
+
+
+.add-quiz-btn{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(63, 63, 218);
+  color: white;
+  border-radius: 5px;
+  border: none;
+  padding: 10px;
   cursor: pointer;
 }
