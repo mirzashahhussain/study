@@ -16,9 +16,6 @@ const QuizSchema = new Schema({
   marks: {
     type: String,
   },
-  totalMarks: {
-    type: String,
-  },
   correctOption: {
     type: String,
   },

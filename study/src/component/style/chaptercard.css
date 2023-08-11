@@ -1,25 +1,22 @@
 .chapter-card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   border-radius: 5px;
   padding: 5px;
   cursor: pointer;
   transition: 0.2s;
-  margin-bottom: 5px;
 }
 .chapter-card:hover {
   border: 1px solid #ccc;
 }
 
 .chapter-name {
-  position: absolute;
-  left: 30px;
   font-size: 15px;
   background-color: white;
   border-radius: 5px;
 }
-
 .chapter-length {
   font-size: 14px;
   color: #666;
@@ -32,15 +29,24 @@
   transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
 }
 
-/* Apply styles to the video element when open */
+.stop-icon{
+  display: none;
+}
+
 .chapter-card.open .chapter-video {
   opacity: 1;
   max-height: 150px;
 }
 
-/* Hide the chapter length when open */
 .chapter-card.open .chapter-length {
   display: none;
+}
+
+.chapter-card.open .play-icon {
+  display: none;
+}
+.chapter-card.open .stop-icon{
+  display: contents;
 }
 
 .chapter-card.open .chapter-name {

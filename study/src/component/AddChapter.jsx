@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
 import { CourseContext } from "../context/CourseContext";
-
 import "./style/addchapter.css";
 
 const AddChapter = ({ courseId }) => {
@@ -37,12 +36,13 @@ const AddChapter = ({ courseId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await addChapter(chapterData);
+    console.log(chapterData);
     // Clear form fields after submitting
     setChapterData({
       ChapterName: "",
       ChapterLength: "",
-      ChapterVideo: "",
-      courseId: "",
+      ChapterVideo: null,
+      courseId: courseId,
     });
     setShowAddForm(false); // Hide the form after submitting
   };
@@ -57,10 +57,14 @@ const AddChapter = ({ courseId }) => {
       const video = document.createElement("video");
       video.preload = "metadata";
       video.onloadedmetadata = function () {
+        URL.revokeObjectURL(video.src); // Revoke the object URL to free resources
         const duration = video.duration; // duration in seconds
         const minutes = Math.floor(duration / 60);
         const seconds = Math.floor(duration % 60);
         resolve(`${minutes} min ${seconds} sec`);
+      };
+      video.onerror = function () {
+        reject(new Error("Error loading video."));
       };
       video.src = URL.createObjectURL(file);
     });

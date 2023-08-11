@@ -1,249 +1,233 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./style/quizcard.css";
 import { CourseContext } from "../context/CourseContext";
+import Modal from "react-modal";
 
-function QuizCard() {
-  const { quiz, addQuiz, updateQuiz, deleteQuiz } = useContext(CourseContext);
-  const [showAddQuiz, setShowAddQuiz] = useState(false);
-  const [questions, setQuestions] = useState([]);
-  const [currentQuestion, setCurrentQuestion] = useState("");
+function QuizCard({ courseId }) {
+  const { addQuiz, updateQuiz, deleteQuiz, fetchQuizzesForCourse } =
+    useContext(CourseContext);
+
+  const [quizzes, setQuizzes] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [newQuestion, setNewQuestion] = useState("");
   const [options, setOptions] = useState([]);
-  const [currentOption, setCurrentOption] = useState("");
-  const [correctOption, setCorrectOption] = useState(null);
-  const [marks, setMarks] = useState(0);
-  const [editingQuestionIndex, setEditingQuestionIndex] = useState(null);
-  const [editingOptionIndex, setEditingOptionIndex] = useState(null);
+  const [correctOption, setCorrectOption] = useState(0);
+  const [marks, setMarks] = useState(1);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  // const courseId = "64cbc4304f507f69abd34a31";
 
-  const handleAddQuiz = async () => {
-    if (
-      currentQuestion.trim() === "" ||
-      options.length === 0 ||
-      correctOption === null ||
-      marks <= 0
-    ) {
-      return;
+  useEffect(() => {
+    fetchQuizzes();
+
+    async function fetchQuizzes() {
+      const quizzesData = await fetchQuizzesForCourse(courseId);
+      setQuizzes(quizzesData);
     }
-
-    if (editingQuestionIndex !== null) {
-      const updatedQuestions = [...questions];
-      const updatedQuestion = {
-        question: currentQuestion,
-        options: options,
-        correctOption: correctOption,
-        marks: marks,
-      };
-      updatedQuestions[editingQuestionIndex] = updatedQuestion;
-      setQuestions(updatedQuestions);
-
-      setEditingQuestionIndex(null);
-    } else {
-      const newQuestion = {
-        question: currentQuestion,
-        options: options,
-        correctOption: correctOption,
-        marks: marks,
-      };
-      setQuestions([...questions, newQuestion]);
-    }
-
-    setCurrentQuestion("");
-    setOptions([]);
-    setCurrentOption("");
-    setCorrectOption(null);
-    setShowAddQuiz(false);
-    setMarks(0);
-    setEditingOptionIndex(null);
-  };
+  }, [courseId]);
 
   const handleAddOption = () => {
-    if (currentOption.trim() === "") {
-      return;
+    setOptions([...options, ""]);
+  };
+
+  const handleOptionChange = (index, value) => {
+    const newOptions = [...options];
+    newOptions[index] = value;
+    setOptions(newOptions);
+  };
+
+  const handleDeleteOption = (index) => {
+    const newOptions = options.filter((_, i) => i !== index);
+    setOptions(newOptions);
+  };
+
+  const handleAddOrUpdateQuiz = async () => {
+    const newQuiz = {
+      question: newQuestion,
+      options: options,
+      correctOption: correctOption,
+      marks: marks,
+      courseId: courseId,
+    };
+
+    try {
+      if (selectedQuiz) {
+        await updateQuiz(selectedQuiz._id, newQuiz);
+      } else {
+        await addQuiz(newQuiz);
+        console.log(newQuiz);
+      }
+      resetModal();
+    } catch (error) {
+      console.log("Failed to add/update quiz:", error);
     }
-
-    if (editingOptionIndex !== null) {
-      const updatedOptions = [...options];
-      updatedOptions[editingOptionIndex] = currentOption;
-      setOptions(updatedOptions);
-      setEditingOptionIndex(null);
-    } else {
-      setOptions([...options, currentOption]);
-    }
-
-    setCurrentOption("");
   };
 
-  const handleDeleteQuestion = async (index) => {
-    const questionId = questions[index]._id;
-
-    const updatedQuestions = [...questions];
-    updatedQuestions.splice(index, 1);
-    setQuestions(updatedQuestions);
-    setEditingQuestionIndex(null);
+  const resetModal = () => {
+    setNewQuestion("");
+    setOptions([""]);
+    setCorrectOption(0);
+    setMarks(1);
+    setSelectedQuiz(null);
+    setIsModalOpen(false);
   };
 
-  const handleDeleteOption = (questionIndex, optionIndex) => {
-    const updatedQuestions = [...questions];
-    const updatedOptions = [...updatedQuestions[questionIndex].options];
-    updatedOptions.splice(optionIndex, 1);
-    updatedQuestions[questionIndex].options = updatedOptions;
-    setQuestions(updatedQuestions);
-    setEditingOptionIndex(null);
+  const getOptionLabel = (index) => {
+    return String.fromCharCode(97 + index);
   };
 
-  const handleEditQuestion = (index) => {
-    const question = questions[index];
-    setCurrentQuestion(question.question);
-    setOptions([...question.options]);
-    setCorrectOption(question.correctOption);
-    setMarks(question.marks);
-    setEditingQuestionIndex(index);
-    setShowAddQuiz(true);
+  const handleDeleteQuiz = (quizId) => {
+    deleteQuiz(quizId);
   };
 
-  const handleEditOption = (optionIndex) => {
-    setCurrentOption(options[optionIndex]);
-    setEditingOptionIndex(optionIndex);
+  const openEditModal = (quiz) => {
+    setSelectedQuiz(quiz);
+    setNewQuestion(quiz.question);
+    setOptions([...quiz.options]);
+    setCorrectOption(quiz.correctOption);
+    setMarks(quiz.marks);
+    setIsModalOpen(true);
   };
 
-  const calculateTotalMarks = () => {
-    let totalMarks = 0;
-    questions.forEach((question) => {
-      totalMarks += question.marks;
-    });
-    return totalMarks;
+  // Function to open the modal
+  const openModal = () => {
+    setModalOpen(true);
+  };
+
+  // Function to close the modal
+  const closeModal = () => {
+    setModalOpen(false);
   };
 
   return (
     <>
-      <div>
-        {showAddQuiz ? (
-          <>
-            <div className="add-course-modal">
-              <div className="add-quiz-form">
-                <div className="add-question">
-                  <label>Question:</label>
+      <h2 className="open-quiz" onClick={openModal}>
+        Quiz
+      </h2>
+      {modalOpen && (
+        <div className="add-quiz-modal">
+          <div className="quiz-card">
+            <div>
+              <button className="add-course-btn" onClick={closeModal}>
+                X
+              </button>
+            </div>
+            <h2>Current Quizzes</h2>
+            <button
+              className="add-quiz-btn"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Add
+            </button>
+            <div className="quizzes-list">
+              {quizzes.map((quiz) => (
+                <div key={quiz._id} className="quiz-item">
+                  {" "}
+                  <div>
+                    <strong>Question:</strong> {quiz.question}
+                  </div>
+                  <div>
+                    <strong>Options:</strong>
+                    <ol type="a">
+                      {quiz.options.map((option, index) => (
+                        <li key={index}>{option}</li>
+                      ))}
+                    </ol>
+                  </div>
+                  <div>
+                    <strong>Correct Option:</strong> {quiz.correctOption}
+                  </div>
+                  <div>
+                    <strong>Marks:</strong> {quiz.marks}
+                  </div>
+                  <div>
+                    <button
+                      id="delete"
+                      onClick={() => handleDeleteQuiz(quiz._id)}
+                    >
+                      <i className="fa-solid fa-trash" />
+                    </button>{" "}
+                    <button onClick={() => openEditModal(quiz)}>
+                      <i className="fa-solid fa-pen-to-square" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Modal
+              isOpen={isModalOpen}
+              onRequestClose={resetModal}
+              contentLabel="Add Quiz Modal"
+            >
+              <div className="add-quiz-main">
+                <label>
+                  Question:
                   <input
                     type="text"
-                    value={currentQuestion}
-                    onChange={(e) => setCurrentQuestion(e.target.value)}
+                    value={newQuestion}
+                    onChange={(e) => setNewQuestion(e.target.value)}
                   />
-                </div>
-                <div>
-                  <label>Options:</label>
-                  <ol type="a">
+                </label>
+                <div className="options-input">
+                  <ol type="A">
                     {options.map((option, index) => (
                       <li key={index}>
-                        {option}{" "}
-                        {index === editingOptionIndex ? (
-                          <>
-                            <button onClick={handleAddOption}>
-                              <i className="fa-solid fa-check"></i>
-                            </button>
-                            <button onClick={() => setEditingOptionIndex(null)}>
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <button onClick={() => handleEditOption(index)}>
-                            <i className="fa-solid fa-pen-to-square"></i>
-                          </button>
-                        )}
-                        {correctOption === index && (
-                          <span>(Correct Option)</span>
-                        )}
+                        <input
+                          required={true}
+                          type="text"
+                          value={option}
+                          onChange={(e) =>
+                            handleOptionChange(index, e.target.value)
+                          }
+                        />
+                        <button
+                          id="delete"
+                          onClick={() => handleDeleteOption(index)}
+                          disabled={options.length === 1}
+                        >
+                          <i className="fa-solid fa-trash" />
+                        </button>
+                        <button
+                          onClick={handleAddOption}
+                          disabled={!option.trim()}
+                        >
+                          <i className="fa-solid fa-plus" />
+                        </button>
                       </li>
                     ))}
                   </ol>
-                  <input
-                    type="text"
-                    value={currentOption}
-                    onChange={(e) => setCurrentOption(e.target.value)}
-                  />
-                  <button onClick={handleAddOption}>
-                    {editingOptionIndex !== null ? "Update" : "Add"}
-                  </button>
-                  <div>
-                    <label>Correct Option:</label>
-                    <select
-                      value={correctOption}
-                      onChange={(e) =>
-                        setCorrectOption(parseInt(e.target.value))
-                      }
-                    >
-                      <option value={null}>Select Correct Option</option>
-                      {options.map((_, index) => (
-                        <option key={index} value={index}>
-                          Option {index + 1}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
                 </div>
-                <div>
-                  <label>Marks:</label>
+                <label>
+                  Correct Option:
+                  <select
+                    class="minimal"
+                    value={correctOption}
+                    onChange={(e) => setCorrectOption(e.target.value)}
+                  >
+                    {options.map((option, index) => (
+                      <option key={index} value={option}>
+                        {getOptionLabel(index)} {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Marks:
                   <input
                     type="number"
-                    min={1}
                     value={marks}
-                    onChange={(e) => setMarks(parseInt(e.target.value))}
+                    onChange={(e) => setMarks(Number(e.target.value))}
                   />
-                </div>
-                <button onClick={handleAddQuiz}>
-                  {editingQuestionIndex !== null ? "Update " : "Add "}
+                </label>
+                <button onClick={handleAddOrUpdateQuiz}>
+                  {selectedQuiz ? "Update" : "Save"}
                 </button>
-                <button onClick={() => setShowAddQuiz(false)}>close</button>
+                <button onClick={resetModal}>Cancel</button>
               </div>
-            </div>
-          </>
-        ) : (
-          <button className="add-quiz-btn" onClick={() => setShowAddQuiz(true)}>
-            <i className="fa-solid fa-plus"></i>
-          </button>
-        )}
-        <div className="add-quiz-body">
-          <h2>Added Quizzes</h2>
-          {questions.map((question, questionIndex) => (
-            <div key={questionIndex}>
-              <p>
-                Question {questionIndex + 1}: {question.question}
-                <p>Marks: {question.marks}</p>
-              </p>
-
-              <ol type="a">
-                {question.options.map((option, optionIndex) => (
-                  <li key={optionIndex}>
-                    {option}{" "}
-                    <button
-                      onClick={() =>
-                        handleDeleteOption(questionIndex, optionIndex)
-                      }
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                    {question.correctOption === optionIndex && (
-                      <span>(Correct Option)</span>
-                    )}
-                  </li>
-                ))}
-              </ol>
-
-              <button
-                className="quiz-btn-style"
-                onClick={() => handleEditQuestion(questionIndex)}
-              >
-                <i className="fa-solid fa-pen-to-square"></i>
-              </button>
-              <button
-                className="quiz-btn-style"
-                onClick={() => handleDeleteQuestion(questionIndex)}
-              >
-                <i className="fa-solid fa-trash"></i>
-              </button>
-            </div>
-          ))}
-          <p>Total Marks: {calculateTotalMarks()}</p>
+            </Modal>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

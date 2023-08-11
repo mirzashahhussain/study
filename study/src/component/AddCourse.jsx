@@ -345,7 +345,7 @@ const AddCourse = () => {
                     }}
                     courseId={selectedCourseId}
                   />
-                  <QuizCard />
+                  <QuizCard courseId={selectedCourseId} />
                 </>
               )}
 

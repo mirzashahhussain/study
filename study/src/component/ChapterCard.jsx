@@ -24,11 +24,17 @@ function ChapterCard(props) {
 
   return (
     <div className={`chapter-card ${isOpen ? "open" : ""}`}>
+      <div className="play-icon">
+        <i className="fa-regular fa-circle-play" />
+      </div>
+      <div className="stop-icon">
+        <i className="fa-regular fa-circle-stop" />
+      </div>
       <h2 className="chapter-name" onClick={toggleDropdown}>
         {chapterName}
       </h2>
       <h3 className="chapter-length">{chapterLength}</h3>
-      
+
       {isOpen && (
         <video width="100%" height="auto" controls>
           <source
@@ -39,6 +45,7 @@ function ChapterCard(props) {
           />
         </video>
       )}
+
       {visibility && (
         <div className="chapter-card-options">
           {visibility.edit && (

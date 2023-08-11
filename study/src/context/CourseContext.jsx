@@ -44,7 +44,7 @@ const CourseProvider = ({ children }) => {
         }
       );
       const chaptersData = await chaptersResponse.json();
-      console.log(chaptersData);
+      // console.log(chaptersData);
       setChapters(chaptersData);
       return chaptersData;
     } catch (error) {
@@ -149,6 +149,7 @@ const CourseProvider = ({ children }) => {
       const newChapter = await response.json();
       setChapters((prevChapters) => [...prevChapters, newChapter]);
     } catch (error) {
+      console.log(newChapterData);
       console.error("Error adding new chapter:", error);
     }
   };
@@ -231,8 +232,8 @@ const CourseProvider = ({ children }) => {
     }
   };
 
-  // Function to add quizzes for a given course
-  const addQuizzes = async (newQuizData) => {
+  // Function to add a new quiz
+  const addQuiz = async (newQuizData) => {
     try {
       const response = await fetch(`http://localhost:5000/api/quiz/addQuiz`, {
         method: "POST",
@@ -243,15 +244,16 @@ const CourseProvider = ({ children }) => {
         },
         body: JSON.stringify(newQuizData),
       });
+      console.log("Adding new quiz:", newQuizData);
       const newQuiz = await response.json();
       setQuiz((prevQuiz) => [...prevQuiz, newQuiz]);
     } catch (error) {
-      console.error("Failed to adding new quiz:", error);
+      console.error("Failed to add new quiz:", error);
     }
   };
 
-  // Function to update quizzes for a given course
-  const updateQuizzes = async (quizId, updatedQuizData) => {
+  // Function to update a quiz
+  const updateQuiz = async (quizId, updatedQuizData) => {
     try {
       const response = await fetch(
         `http://localhost:5000/api/quiz/updateQuiz/${quizId}`,
@@ -267,15 +269,15 @@ const CourseProvider = ({ children }) => {
       );
       const updatedQuiz = await response.json();
       setQuiz((prevQuiz) =>
-        prevQuiz.map((quiz) => (quiz._id === quizId ? updatedQuiz.quiz : quiz))
+        prevQuiz.map((quiz) => (quiz._id === quizId ? updatedQuiz : quiz))
       );
     } catch (error) {
-      console.error("Failed to updating quiz:", error);
+      console.error("Failed to update quiz:", error);
     }
   };
 
-  // Function to update quizzes for a given course
-  const deleteQuizzes = async (quizId) => {
+  // Function to delete a quiz
+  const deleteQuiz = async (quizId) => {
     try {
       const response = await fetch(
         `http://localhost:5000/api/quiz/deleteQuiz/${quizId}`,
@@ -291,10 +293,70 @@ const CourseProvider = ({ children }) => {
       if (response.status === 200) {
         setQuiz((prevQuiz) => prevQuiz.filter((quiz) => quiz._id !== quizId));
       } else {
-        console.error("Error deleting course:", response.statusText);
+        console.error("Error deleting quiz:", response.statusText);
       }
     } catch (error) {
-      console.error("Falied to deleting quiz:", error);
+      console.error("Failed to delete quiz:", error);
+    }
+  };
+
+  // Function to submit user's quiz answer and check correctness
+  const submitQuizAnswer = async (quizId, selectedOption) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/quiz/submitAnswers/${quizId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token":
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRiZjlmZTc4NzZlNmZmOTc0YzY4NWZlIn0sImlhdCI6MTY5MDI4NjgyOX0.2bU69aFYcTAT1YM1uADZCmwdxKwdpVMT2uMc4Fvk8MQ",
+          },
+          body: JSON.stringify({ selectedOption }),
+        }
+      );
+
+      const responseJson = await response.json();
+
+      // Extract correctness status from the response
+      const isCorrect = responseJson.isCorrect;
+      console.log(responseJson , isCorrect)
+
+      // Prepare the message based on correctness
+      let message;
+      if (isCorrect) {
+        message = "Your answer is correct!";
+      } else {
+        message = "Oops! Your answer is wrong.";
+      }
+
+      return { isCorrect, message };
+    } catch (error) {
+      console.error("Error submitting quiz answer:", error);
+      return { isCorrect: false, message: "Error submitting answer." };
+    }
+  };
+
+  // Function to check if a user has passed or failed a quiz
+  const checkQuizResult = async (quizId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/quiz/checkResult/${quizId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token":
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRiZjlmZTc4NzZlNmZmOTc0YzY4NWZlIn0sImlhdCI6MTY5MDI4NjgyOX0.2bU69aFYcTAT1YM1uADZCmwdxKwdpVMT2uMc4Fvk8MQ",
+          },
+        }
+      );
+
+      const resultData = await response.json();
+      return resultData;
+    } catch (error) {
+      console.error("Error checking quiz result:", error);
+      return { error: "Error checking quiz result." };
     }
   };
 
@@ -311,6 +373,7 @@ const CourseProvider = ({ children }) => {
         loading,
         chapters,
         quiz,
+
         fetchChaptersForCourse,
         fetchQuizzesForCourse,
         addCourse,
@@ -319,9 +382,11 @@ const CourseProvider = ({ children }) => {
         addChapter,
         updateChapter,
         deleteChapter,
-        addQuizzes,
-        updateQuizzes,
-        deleteQuizzes,
+        addQuiz,
+        updateQuiz,
+        deleteQuiz,
+        submitQuizAnswer,
+        checkQuizResult,
       }}
     >
       {children}

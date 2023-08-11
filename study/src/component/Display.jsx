@@ -4,6 +4,7 @@ import CourseCards from "./CourseCards";
 import DisplayChapters from "./DisplayChapters";
 import Modal from "react-modal";
 import "./style/display.css";
+import DisplayQuiz from "./DisplayQuiz";
 
 const Display = () => {
   const { courses, fetchChaptersForCourse } = useContext(CourseContext);
@@ -13,7 +14,7 @@ const Display = () => {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
 
   const handleCourseClick = async (courseId) => {
-    console.log("Selected courseId:", courseId); // Add this console log
+    console.log("Selected courseId:", courseId);
     setLoadingChapters(true);
     setSelectedCourseId(courseId);
     const chaptersData = await fetchChaptersForCourse(courseId);
@@ -52,9 +53,14 @@ const Display = () => {
         {loadingChapters ? (
           <p>Loading chapters...</p>
         ) : (
-          <DisplayChapters chapters={selectedCourseChapters} />
+          <>
+            <DisplayChapters chapters={selectedCourseChapters} />
+            <DisplayQuiz courseId={selectedCourseId} />
+          </>
         )}
-        <button className="display-modal-btn" onClick={closeModal}>Close</button>
+        <button className="display-modal-btn" onClick={closeModal}>
+          Close
+        </button>
       </Modal>
     </div>
   );

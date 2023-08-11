@@ -8,41 +8,15 @@ const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = "uploads"; // Directory name for uploads
-    const uploadPath = path.join(__dirname, uploadDir);
-
-    // Check if the "uploads" directory exists, if not, create it
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath);
-    }
-
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    // Generate a unique filename for the uploaded file
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const filename = file.originalname.split(".").slice(0, -1).join(".");
-    cb(null, `${filename}-${uniqueSuffix}.mp4`);
-  },
-  fileFilter: function (req, file, cb) {
-    // Check if the file is a valid video file with .mp4 extension
-    const filetypes = /mp4/;
-    const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(
-      path.extname(file.originalname).toLowerCase()
-    );
-
-    if (mimetype && extname) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only .mp4 video files are allowed!"));
-    }
-  },
+cloudinary.config({
+  cloud_name: "dffav7sdj",
+  api_key: "972785836826929",
+  api_secret: "3bMgYnOQfoPjd0E3aDNh_i5vp0A",
 });
 
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // ROUTE 1: Fetch All Courses - GET "/api/course/fetchallcourse"
@@ -196,7 +170,7 @@ router.delete("/deleteCourse/:id", fetchuser, async (req, res) => {
 // ROUTE 5: Get all chapters for a specific Course using: GET "/api/course/fetchChapters/:courseId". login required
 router.get("/fetchChapters/:courseId", async (req, res) => {
   try {
-    const courseId = req.params.courseId;
+    const courseId = req.params.courseId.trim();
 
     // Check if the course exists and belongs to the user
     const course = await Course.findOne({
@@ -219,21 +193,26 @@ router.get("/fetchChapters/:courseId", async (req, res) => {
 router.post(
   "/addChapter",
   fetchuser,
-  upload.single("ChapterVideo"), // added
   [
     body("ChapterName", "Chapter name is required").notEmpty(),
     body("courseId", "Valid courseId is required").isMongoId(),
   ],
+  upload.single("ChapterVideo"),
   async (req, res) => {
     try {
       const { ChapterName, ChapterLength, courseId } = req.body;
 
       // Check if the file was uploaded successfully and get the file path
-      const chapterVideo = req.file ? req.file.path : null;
+      const chapterVideoPath = req.file ? req.file.path : null;
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
+      }
+
+      // Ensure that req.file exists before using it
+      if (!req.file) {
+        return res.status(400).send("Missing required parameter - file");
       }
 
       // Check if the course exists and belongs to the user
@@ -245,11 +224,23 @@ router.post(
         return res.status(404).send("Course Not Found or Not Allowed");
       }
 
+      // Upload the video to Cloudinary
+      const cloudinaryUploadResult = await cloudinary.uploader.upload(
+        chapterVideoPath,
+        {
+          resource_type: "video",
+          public_id: `chapter_videos/${uuidv4()}`,
+        }
+      );
+
+      // Remove the temporary file from the server
+      fs.unlinkSync(req.file.path);
+
       const chapter = new Chapter({
         course: courseId,
         ChapterName,
         ChapterLength,
-        ChapterVideo: chapterVideo,
+        ChapterVideo: cloudinaryUploadResult.secure_url,
       });
 
       const savedChapter = await chapter.save();
@@ -258,7 +249,7 @@ router.post(
       await course.save();
       res.json(savedChapter);
     } catch (error) {
-      console.error(error.message);
+      console.log(error.message);
       res.status(500).send("Internal Server Error");
     }
   }
