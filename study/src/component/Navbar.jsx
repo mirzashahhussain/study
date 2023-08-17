@@ -7,6 +7,7 @@ function Navbar() {
       <div>
         <Link to="/">Home</Link>
         <Link to="addcr">Add Course</Link>
+        <Link to="certi">Certificate</Link>
       </div>
     </>
   );

@@ -10,8 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "cloudinary": "^1.40.0",
     "cloudinary-react": "^1.8.1",
     "fluent-ffmpeg": "^2.1.2",
+    "form-data": "^4.0.0",
+    "jspdf": "^2.5.1",
+    "node-fetch": "^3.3.2",
+    "pdfjs-dist": "^3.9.179",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-modal": "^3.16.1",

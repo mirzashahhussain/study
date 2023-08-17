@@ -201,6 +201,7 @@ router.post(
   async (req, res) => {
     try {
       const { ChapterName, ChapterLength, courseId } = req.body;
+      const { name, type, size } = req.body;
 
       // Check if the file was uploaded successfully and get the file path
       const chapterVideoPath = req.file ? req.file.path : null;
@@ -211,7 +212,7 @@ router.post(
       }
 
       // Ensure that req.file exists before using it
-      if (!req.file) {
+      if (!chapterVideoPath) {
         return res.status(400).send("Missing required parameter - file");
       }
 
@@ -240,7 +241,12 @@ router.post(
         course: courseId,
         ChapterName,
         ChapterLength,
-        ChapterVideo: cloudinaryUploadResult.secure_url,
+        ChapterVideo: {
+          url: cloudinaryUploadResult.secure_url,
+          name: name,
+          type: type,
+          size: size,
+        },
       });
 
       const savedChapter = await chapter.save();

@@ -7,11 +7,13 @@ import "./style/display.css";
 import DisplayQuiz from "./DisplayQuiz";
 
 const Display = () => {
-  const { courses, fetchChaptersForCourse } = useContext(CourseContext);
+  const { courses, fetchChaptersForCourse, generateCertificate } =
+    useContext(CourseContext);
   const [selectedCourseChapters, setSelectedCourseChapters] = useState([]);
   const [loadingChapters, setLoadingChapters] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
+  const userId = "64bf9fe7876e6ff974c685fe";
 
   const handleCourseClick = async (courseId) => {
     console.log("Selected courseId:", courseId);
@@ -20,7 +22,18 @@ const Display = () => {
     const chaptersData = await fetchChaptersForCourse(courseId);
     setSelectedCourseChapters(chaptersData);
     setLoadingChapters(false);
-    setModalIsOpen(true); // Open the modal after fetching the chapters
+    setModalIsOpen(true);
+  };
+
+  const downloadCertificate = async () => {
+    const certificateData = {
+      userName: "Mirza Shah Hussain",
+      courseName: "React",
+      courseDuration: "1 Week",
+      completionDate: "14-Aug-2023",
+    };
+
+    await generateCertificate(userId, selectedCourseId, certificateData);
   };
 
   const closeModal = () => {
@@ -56,6 +69,9 @@ const Display = () => {
           <>
             <DisplayChapters chapters={selectedCourseChapters} />
             <DisplayQuiz courseId={selectedCourseId} />
+            <button className="crtificate" onClick={downloadCertificate}>
+              View Certificate
+            </button>
           </>
         )}
         <button className="display-modal-btn" onClick={closeModal}>

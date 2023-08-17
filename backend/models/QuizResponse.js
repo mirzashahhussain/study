@@ -10,13 +10,14 @@ const QuizResponseSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "quiz",
   },
+
   selectedOption: {
     type: String,
   },
   isCorrect: {
     type: Boolean,
   },
-  totalMarks: {
+  marks: {
     type: Number,
   },
 });

@@ -244,7 +244,7 @@ const CourseProvider = ({ children }) => {
         },
         body: JSON.stringify(newQuizData),
       });
-      console.log("Adding new quiz:", newQuizData);
+      // console.log("Adding new quiz:", newQuizData);
       const newQuiz = await response.json();
       setQuiz((prevQuiz) => [...prevQuiz, newQuiz]);
     } catch (error) {
@@ -300,11 +300,37 @@ const CourseProvider = ({ children }) => {
     }
   };
 
-  // Function to submit user's quiz answer and check correctness
-  const submitQuizAnswer = async (quizId, selectedOption) => {
+  // Function to check if a user has passed or failed a quiz
+  const checkQuizResult = async (quizResponses) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/quiz/checkQuiz`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token":
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRiZjlmZTc4NzZlNmZmOTc0YzY4NWZlIn0sImlhdCI6MTY5MDI4NjgyOX0.2bU69aFYcTAT1YM1uADZCmwdxKwdpVMT2uMc4Fvk8MQ",
+        },
+        body: JSON.stringify({ quizResponses }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const resultData = await response.json();
+      // console.log(resultData);
+      return resultData.results;
+    } catch (error) {
+      console.error("Error checking quiz result:", error);
+      return [];
+    }
+  };
+
+  // Function to generate a certificate
+  const generateCertificate = async (userId, courseId, certificateData) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/quiz/submitAnswers/${quizId}`,
+        `http://localhost:5000/api/quiz/generateCertificate/${userId}/${courseId}`,
         {
           method: "POST",
           headers: {
@@ -312,58 +338,43 @@ const CourseProvider = ({ children }) => {
             "auth-token":
               "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRiZjlmZTc4NzZlNmZmOTc0YzY4NWZlIn0sImlhdCI6MTY5MDI4NjgyOX0.2bU69aFYcTAT1YM1uADZCmwdxKwdpVMT2uMc4Fvk8MQ",
           },
-          body: JSON.stringify({ selectedOption }),
+          body: JSON.stringify(certificateData),
         }
       );
 
-      const responseJson = await response.json();
-
-      // Extract correctness status from the response
-      const isCorrect = responseJson.isCorrect;
-      console.log(responseJson , isCorrect)
-
-      // Prepare the message based on correctness
-      let message;
-      if (isCorrect) {
-        message = "Your answer is correct!";
-      } else {
-        message = "Oops! Your answer is wrong.";
-      }
-
-      return { isCorrect, message };
+      const certificateBlob = await response.blob();
+      const url = window.URL.createObjectURL(certificateBlob);
+      window.open(url);
     } catch (error) {
-      console.error("Error submitting quiz answer:", error);
-      return { isCorrect: false, message: "Error submitting answer." };
+      console.error("Error generating certificate:", error);
     }
   };
 
-  // Function to check if a user has passed or failed a quiz
-  const checkQuizResult = async (quizId) => {
+  // Function to fetch certificate URLs for a specific user
+  const fetchCertificates = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/quiz/checkResult/${quizId}`,
+        `http://localhost:5000/api/quiz/certificates/${userId}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "auth-token":
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRiZjlmZTc4NzZlNmZmOTc0YzY4NWZlIn0sImlhdCI6MTY5MDI4NjgyOX0.2bU69aFYcTAT1YM1uADZCmwdxKwdpVMT2uMc4Fvk8MQ",
           },
         }
       );
-
-      const resultData = await response.json();
-      return resultData;
+      const data = await response.json();
+      console.log(data);
+      return data.certificateUrls;
     } catch (error) {
-      console.error("Error checking quiz result:", error);
-      return { error: "Error checking quiz result." };
+      console.error("Error fetching certificates:", error);
+      return [];
     }
   };
-
   useEffect(() => {
     fetchCourses();
     fetchChaptersForCourse();
     fetchQuizzesForCourse();
+    fetchCertificates();
   }, []);
 
   return (
@@ -373,7 +384,6 @@ const CourseProvider = ({ children }) => {
         loading,
         chapters,
         quiz,
-
         fetchChaptersForCourse,
         fetchQuizzesForCourse,
         addCourse,
@@ -385,8 +395,9 @@ const CourseProvider = ({ children }) => {
         addQuiz,
         updateQuiz,
         deleteQuiz,
-        submitQuizAnswer,
         checkQuizResult,
+        generateCertificate,
+        fetchCertificates,
       }}
     >
       {children}

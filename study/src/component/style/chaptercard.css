@@ -9,12 +9,11 @@
   transition: 0.2s;
 }
 .chapter-card:hover {
-  border: 1px solid #ccc;
+  background-color: #e9e7e7;
 }
 
 .chapter-name {
   font-size: 15px;
-  background-color: white;
   border-radius: 5px;
 }
 .chapter-length {
@@ -29,7 +28,7 @@
   transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
 }
 
-.stop-icon{
+.stop-icon {
   display: none;
 }
 
@@ -45,7 +44,7 @@
 .chapter-card.open .play-icon {
   display: none;
 }
-.chapter-card.open .stop-icon{
+.chapter-card.open .stop-icon {
   display: contents;
 }
 

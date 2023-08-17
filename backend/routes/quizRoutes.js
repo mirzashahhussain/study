@@ -3,9 +3,39 @@ const mongoose = require("mongoose");
 const router = express.Router();
 const fetchuser = require("../middleware/fetchuser");
 const Course = require("../models/Course");
+const Certificate = require("../models/Certificates");
 const Quiz = require("../models/Quiz");
 const QuizResponse = require("../models/QuizResponse");
 const { body, validationResult } = require("express-validator");
+const pug = require("pug");
+const fs = require("fs");
+const path = require("path");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+const puppeteer = require("puppeteer");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: "dffav7sdj",
+  api_key: "972785836826929",
+  api_secret: "3bMgYnOQfoPjd0E3aDNh_i5vp0A",
+});
+
+async function generatePdfFromHtml(html) {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+
+  await page.setContent(html);
+
+  const pdfBuffer = await page.pdf({
+    format: "A4",
+    printBackground: true,
+  });
+
+  await browser.close();
+
+  return pdfBuffer;
+}
 
 // ROUTE 1: Fetch all quizzes for a specific Course using: GET "/api/quiz/fetchQuizzes/:CourseId". login required
 router.get("/fetchQuizzes/:courseId", async (req, res) => {
@@ -41,8 +71,7 @@ router.post(
   ],
   async (req, res) => {
     try {
-      const { question, options, correctOption, marks, totalMarks, courseId } =
-        req.body;
+      const { question, options, correctOption, marks, courseId } = req.body;
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -62,7 +91,6 @@ router.post(
         question,
         options,
         marks,
-        totalMarks,
         correctOption,
       });
 
@@ -79,10 +107,9 @@ router.post(
     }
   }
 );
-
 // ROUTE 3: Update an existing quiz using: PUT "/api/quiz/updateQuiz/:id". login required
 router.put("/updateQuiz/:id", async (req, res) => {
-  const { question, options, correctOption, marks, totalMarks } = req.body;
+  const { question, options, correctOption, marks } = req.body;
   try {
     const updatedQuiz = {};
 
@@ -98,20 +125,11 @@ router.put("/updateQuiz/:id", async (req, res) => {
     if (marks) {
       updatedQuiz.marks = marks;
     }
-    if (totalMarks) {
-      updatedQuiz.totalMarks = totalMarks;
-    }
 
     let quiz = await Quiz.findById(req.params.id);
     if (!quiz) {
       return res.status(404).send("Quiz Not Found");
     }
-
-    // // Check if the quiz belongs to the user's Course
-    // const courseId = req.body.courseId;
-    // if (quiz.course !== courseId) {
-    //   return res.status(401).send("Not Allowed");
-    // }
 
     quiz = await Quiz.findByIdAndUpdate(
       req.params.id,
@@ -133,12 +151,6 @@ router.delete("/deleteQuiz/:id", async (req, res) => {
       return res.status(404).json({ error: "Quiz Not Found" });
     }
 
-    // Check if the quiz belongs to the user's Course
-    // const courseId = req.body.courseId;
-    // if (quiz.course !== courseId) {
-    //   return res.status(401).json({ error: "Not Allowed" });
-    // }
-
     await Quiz.findByIdAndDelete(req.params.id);
     res.json({ Success: "Quiz has been deleted", Quiz: quiz });
   } catch (error) {
@@ -147,80 +159,62 @@ router.delete("/deleteQuiz/:id", async (req, res) => {
   }
 });
 
-// ROUTE 5: Submit user's MCQ answers for a quiz: POST "/api/quiz/submitAnswers/:quizId"
-router.post("/submitAnswers/:quizId", fetchuser, async (req, res) => {
+// ROUTE 5: Check multiple quiz submissions and results: POST "/api/quiz/checkQuiz"
+router.post("/checkQuiz", fetchuser, async (req, res) => {
   try {
-    const quizId = req.params.quizId;
-    const { selectedOption } = req.body;
+    const quizResponses = req.body.quizResponses;
 
-    const quiz = await Quiz.findById(quizId);
-    if (!quiz) {
-      return res.status(404).json({ error: "Quiz Not Found" });
+    const results = [];
+
+    for (const quizResponse of quizResponses) {
+      const quizId = quizResponse.quizId;
+      const selectedOption = quizResponse.selectedOption;
+
+      const quiz = await Quiz.findById(quizId);
+      if (!quiz) {
+        results.push({
+          quizId: quizId,
+          error: "Quiz Not Found",
+        });
+        continue;
+      }
+
+      // Check if the selectedOption is correct
+      const isCorrect = selectedOption === quiz.correctOption;
+
+      const question = quiz.question;
+      const correctOption = quiz.correctOption;
+
+      // Calculate total marks based on correctness
+      const marks = isCorrect ? parseInt(quiz.marks) : 0;
+
+      // Create a new quiz response record
+      const newQuizResponse = new QuizResponse({
+        user: req.user.id,
+        quiz: quizId,
+        selectedOption,
+        isCorrect,
+        marks,
+      });
+
+      await newQuizResponse.save();
+
+      // Determine if the user has passed or failed the quiz
+      const passingPercentage = 70;
+
+      results.push({
+        quizId: quizId,
+        question: question,
+        selectedOption: selectedOption,
+        correctOption: correctOption,
+        isCorrect: isCorrect,
+        marks: marks,
+        passingPercentage: passingPercentage,
+      });
     }
-
-    // Check if the selectedOption is correct
-    const isCorrect = selectedOption === quiz.correctOption;
-
-    // Calculate total marks based on correctness
-    const totalMarks = isCorrect ? parseInt(quiz.marks) : 0;
-
-    // Create a new quiz response record
-    const quizResponse = new QuizResponse({
-      user: req.user.id,
-      quiz: quizId,
-      selectedOption,
-      isCorrect,
-      totalMarks,
-    });
-
-    await quizResponse.save();
-
-    // Prepare the response message based on the correctness
-    let responseMessage = "Quiz answers submitted successfully.";
-    if (isCorrect) {
-      responseMessage += " Your answer is correct!";
-    } else {
-      responseMessage += " Unfortunately, your answer is wrong.";
-    }
-
-    res.json({ message: responseMessage, isCorrect, totalMarks });
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-// ROUTE 6: Determine if a user has passed or failed a quiz: GET "/api/quiz/checkResult/:quizId"
-router.get("/checkResult/:quizId", fetchuser, async (req, res) => {
-  try {
-    const quizId = req.params.quizId;
-
-    const quiz = await Quiz.findById(quizId);
-    if (!quiz) {
-      return res.status(404).json({ error: "Quiz Not Found" });
-    }
-
-    // Get the user's quiz response
-    const quizResponse = await QuizResponse.findOne({
-      user: req.user.id,
-      quiz: quizId,
-    });
-
-    if (!quizResponse) {
-      return res.status(404).json({ error: "Quiz Response Not Found" });
-    }
-
-    const passingPercentage = 70;
-    const userPercentage =
-      (quizResponse.totalMarks / parseInt(quiz.totalMarks)) * 100;
-
-    const isPassed = userPercentage >= passingPercentage;
 
     res.json({
-      quizId: quizId,
-      userPercentage: userPercentage,
-      passingPercentage: passingPercentage,
-      isPassed: isPassed,
+      results: results,
     });
   } catch (error) {
     console.error(error.message);
@@ -228,4 +222,104 @@ router.get("/checkResult/:quizId", fetchuser, async (req, res) => {
   }
 });
 
+// ROUTE 6: Genrate User certificate: POST "/api/quiz/generateCertificate/:userId/:courseId"
+router.post(
+  "/generateCertificate/:userId/:courseId",
+  upload.none(),
+  async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const courseId = req.params.courseId;
+
+      const userName = req.body.userName;
+      const courseName = req.body.courseName;
+      const courseDuration = req.body.courseDuration;
+      const completionDate = req.body.completionDate;
+
+      // Validate the userId before using it
+      if (!mongoose.isValidObjectId(userId)) {
+        return res.status(400).send("Invalid userId");
+      }
+
+      // Compile the Pug template
+      const templatePath = path.join(__dirname, "views", "certificate.pug");
+      const compiledTemplate = pug.compileFile(templatePath);
+
+      // Render the template with data
+      const certificateHtml = compiledTemplate({
+        userId,
+        userName,
+        courseName,
+        courseDuration,
+        completionDate,
+      });
+
+      // Create a PDF from the rendered HTML (you'll need a library like `puppeteer` for this)
+      const pdfBuffer = await generatePdfFromHtml(certificateHtml);
+
+      // Save the PDF to a file (you may want to create a 'certificates' folder)
+      const pdfPath = path.join(
+        __dirname,
+        "..",
+        "certificates",
+        `${userId}_${courseId}_certificate.pdf`
+      );
+
+      fs.writeFileSync(pdfPath, pdfBuffer);
+
+      // Upload the PDF to Cloudinary
+      const cloudinaryResponse = await cloudinary.uploader
+        .upload_stream(
+          {
+            folder: `certificates/${userId}_${courseId}`,
+            public_id: `${userId}_${courseId}_certificate`,
+            resource_type: "auto",
+            format: "png",
+          },
+          async (error, result) => {
+            if (error) {
+              console.error(error.message);
+              return res.status(500).send("Cloudinary Upload Error");
+            }
+
+            // Save the PDF URL to the certificate document in MongoDB
+            const certificate = new Certificate({
+              user: userId,
+              certificateUrl: result.secure_url,
+            });
+
+            await certificate.save();
+
+            // Serve the generated PDF to the user
+            res.contentType("application/pdf");
+            res.send(pdfBuffer);
+          }
+        )
+        .end(pdfBuffer);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+);
+
+// Fetch certificate URLs for a specific user and course
+router.get("/certificates/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const certificates = await Certificate.find({
+      user: userId,
+    });
+
+    const certificateUrls = certificates.map(
+      (certificate) => certificate.certificateUrl
+    );
+
+    res.status(200).json({ certificateUrls });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+});
 module.exports = router;

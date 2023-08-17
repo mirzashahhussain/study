@@ -8,7 +8,11 @@ const AddChapter = ({ courseId }) => {
   const [chapterData, setChapterData] = useState({
     ChapterName: "",
     ChapterLength: "",
-    ChapterVideo: null,
+    ChapterVideo: {
+      name: "",
+      type: "",
+      size: "",
+    },
     courseId: courseId,
   });
 
@@ -22,13 +26,13 @@ const AddChapter = ({ courseId }) => {
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     console.log("Selected File:", file);
+
     // Call the function to get video duration
     const videoDuration = await getVideoDuration(file);
-
     // setChapterData({ ...chapterData, ChapterVideo: file });
     setChapterData({
       ...chapterData,
-      ChapterVideo: file,
+      ChapterVideo: { file, name: file.name, type: file.type, size: file.size },
       ChapterLength: videoDuration,
     });
   };
@@ -41,7 +45,11 @@ const AddChapter = ({ courseId }) => {
     setChapterData({
       ChapterName: "",
       ChapterLength: "",
-      ChapterVideo: null,
+      ChapterVideo: {
+        name: "",
+        type: "",
+        size: "",
+      },
       courseId: courseId,
     });
     setShowAddForm(false); // Hide the form after submitting

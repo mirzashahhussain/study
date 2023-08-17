@@ -36,6 +36,7 @@ const CourseSchema = new Schema({
       ref: "quiz",
     },
   ],
+
   date: {
     type: Date,
     default: Date.now,

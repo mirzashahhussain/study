@@ -15,8 +15,12 @@ const ChapterSchema = new Schema({
     type: String,
   },
   ChapterVideo: {
+    url: String,
+    name: String,
     type: String,
+    size: Number,
   },
+
   date: {
     type: Date,
     default: Date.now,
