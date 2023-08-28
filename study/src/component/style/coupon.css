@@ -1,0 +1,75 @@
+/* Styles for the container */
+.container {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+/* Styles for the title */
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Styles for the form and coupon items */
+.form,
+.coupon-item {
+  margin-bottom: 10px;
+}
+
+/* Styles for the form input fields */
+.form input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Styles for the buttons */
+.button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button-secondary {
+  background-color: #ccc;
+}
+
+/* Styles for the coupon details */
+.coupon-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.coupon-details span {
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+/* Styles for the edit and delete buttons */
+.edit-button,
+.delete-button {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-button {
+  background-color: #dc3545;
+}
+
+/* Disable the delete button when deleting */
+.delete-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

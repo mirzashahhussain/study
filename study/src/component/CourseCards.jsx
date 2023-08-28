@@ -2,7 +2,7 @@ import React from "react";
 import "./style/card.css";
 
 function CourseCards(props) {
-  const { courseImg, courseDisc, courseName, coursePrice, onClick } = props; // Fix destructuring here
+  const { courseImg, courseDisc, courseName, coursePrice, onClick } = props; 
   return (
     <>
       <div className="course-card" onClick={onClick}>

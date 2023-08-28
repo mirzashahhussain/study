@@ -16,7 +16,8 @@ connectToMongo()
     app.use(cors());
     app.use("/api/auth", require("./routes/auth"));
     app.use("/api/course", require("./routes/course"));
-    app.use("/api/quiz", require("./routes/quizRoutes"))
+    app.use("/api/quiz", require("./routes/quizRoutes"));
+    app.use("/api/coupon", require("./routes/coupon"));
 
     app.listen(port, () => {
       console.log(`Study Backend listening on port http://localhost:${port}`);

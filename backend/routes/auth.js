@@ -16,14 +16,13 @@ const router = express.Router();
 router.post(
   "/createuser",
   [
-    body("username", "Enter a valid username").isLength({ min: 4 }),
-    body("email", "Enter a valid username").isEmail(),
+    body("email", "Enter a valid Email").isEmail(),
     body("password", "Password must be atleast 5 characters").isLength({
       min: 5,
     }),
   ],
   async (req, res) => {
-    // If there are errors,return bad request and the errors
+    let { userImg } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ success: false, errors: errors.array() });
@@ -38,13 +37,29 @@ router.post(
         });
       }
 
+      // Process the Course image
+      if (req.files && req.files.userImg) {
+        const file = req.files.userImg;
+        const fileName = uuidv4() + path.extname(file.name);
+        const filePath = path.join(__dirname, "../uploads", fileName);
+
+        // Move the uploaded file to the server
+        await file.mv(filePath);
+
+        // Read the file and convert it to base64
+        const fileData = fs.readFileSync(filePath);
+        userImg = fileData.toString("base64");
+
+        // Delete the temporary file
+        fs.unlinkSync(filePath);
+      }
+
       const salt = await bcrypt.genSalt(10);
       const secPass = await bcrypt.hash(req.body.password, salt);
       // Create a new user
       user = await User.create({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        username: req.body.username,
+        userImg: userImg,
+        fullName: req.body.fullName,
         email: req.body.email,
         password: secPass,
         verified: false,
@@ -68,7 +83,7 @@ router.post(
 router.post(
   "/login",
   [
-    body("username", "Enter a valid username").isLength({ min: 4 }),
+    body("email", "Enter a valid username").isEmail(),
     body("password", "Password cannot be blank").exists(),
   ],
   async (req, res) => {
@@ -78,9 +93,9 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const { userusername, password } = req.body;
+    const { email, password } = req.body;
     try {
-      let user = await User.findOne({ userusername });
+      let user = await User.findOne({ email });
       if (!user) {
         success = false;
         return res
@@ -117,6 +132,7 @@ router.post("/getuser", fetchuser, async (req, res) => {
   try {
     const userId = req.user.id;
     const user = await User.findById(userId).select("-password");
+
     res.send(user);
   } catch (error) {
     console.error(error.message);
@@ -128,9 +144,10 @@ router.post("/getuser", fetchuser, async (req, res) => {
 router.put("/updateuser", fetchuser, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { firstName, lastName, username, email, password } = req.body;
+    const { fullName, email, password } = req.body;
+    let { userImg } = req.body;
 
-    if (!firstname && !lastName && !username && !email && !password) {
+    if (!fullName && !email && !password && !userImg) {
       throw new Error("Empty user details are not allowed");
     } else {
       const user = await User.findById(userId);
@@ -140,14 +157,29 @@ router.put("/updateuser", fetchuser, async (req, res) => {
         );
       } else {
         const updatedUser = {};
-        if (firstName) {
-          updatedUser.firstName = firstName;
+
+        if (userImg) {
+          // Process the Userimage
+          if (req.files && req.files.userImg) {
+            const file = req.files.userImg;
+            const fileName = uuidv4() + path.extname(file.name);
+            const filePath = path.join(__dirname, "../uploads", fileName);
+
+            // Move the uploaded file to the server
+            await file.mv(filePath);
+
+            // Read the file and convert it to base64
+            const fileData = fs.readFileSync(filePath);
+            userImg = fileData.toString("base64");
+
+            // Delete the temporary file
+            fs.unlinkSync(filePath);
+          }
+
+          updatedUser.userImg = userImg;
         }
-        if (lastName) {
-          updatedUser.lastName = lastName;
-        }
-        if (username) {
-          updatedUser.username = username;
+        if (fullName) {
+          updatedUser.fullName = fullName;
         }
         if (email) {
           if (email !== user.email) {

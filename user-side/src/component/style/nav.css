@@ -1,0 +1,107 @@
+@import url("https://fonts.googleapis.com/css2?family=Catamaran&family=Lato&family=PT+Serif:wght@700&display=swap");
+
+* {
+  font-family: "Roboto", "Segoe UI", Helvetica, Arial, sans-serif;
+}
+.nav-container {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  padding: 15px;
+  width: 20%;
+  height: 99vh;
+  background-color: rgb(48, 48, 252);
+  z-index: 999;
+  transition: left 0.9s ease;
+}
+
+.nav-container.open {
+  left: 0;
+}
+
+.user-info-nav {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.circle-box-nav {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  margin-right: 5px;
+}
+
+.user-info-nav p {
+  color: white;
+}
+
+.nav-link {
+  display: flex;
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 5px;
+  gap: 5px;
+}
+
+.nav-link:hover {
+  background-image: linear-gradient(
+    to right,
+    rgba(154, 154, 248, 0) 0%,
+    rgb(154, 154, 248) 100%
+  );
+  background-size: 200% 100%;
+  transition: background 0.3s;
+  background-position: -100% 0;
+}
+
+.nav-link:active {
+  background-color: rgb(154, 154, 248);
+}
+
+.nav-link img {
+  width: 20px;
+}
+
+.navbar-toggle-button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.version {
+  position: absolute;
+  bottom: 15px;
+  display: flex;
+  color: white;
+}
+
+@media (max-width: 400px) {
+  .nav-container {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    padding: 5px;
+    width: 97%;
+    height: 59vh;
+    background-color: rgb(48, 48, 252);
+    z-index: 999;
+    transition: top 0.9s ease;
+  }
+  .nav-container.open {
+    top: 0;
+  }
+  .nav-link {
+    padding: 10px 100px;
+  }
+}

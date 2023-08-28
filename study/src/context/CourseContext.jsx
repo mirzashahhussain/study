@@ -7,6 +7,7 @@ const CourseProvider = ({ children }) => {
   const [courses, setCourses] = useState([]);
   const [chapters, setChapters] = useState([]);
   const [quiz, setQuiz] = useState([]);
+  const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Function to fetch courses from the API
@@ -147,9 +148,9 @@ const CourseProvider = ({ children }) => {
       );
 
       const newChapter = await response.json();
+      console.log("added chapter", newChapter);
       setChapters((prevChapters) => [...prevChapters, newChapter]);
     } catch (error) {
-      console.log(newChapterData);
       console.error("Error adding new chapter:", error);
     }
   };
@@ -370,11 +371,90 @@ const CourseProvider = ({ children }) => {
       return [];
     }
   };
+
+  // Function to add a new coupon code
+  const fetchAllCoupons = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/coupon/fetch-coupons",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const couponsData = await response.json();
+      setCoupons(couponsData.coupons);
+      setLoading(false);
+      return couponsData;
+    } catch (error) {
+      console.error("Error adding new coupon:", error);
+      setLoading(false);
+      return [];
+    }
+  };
+  // Function to add a new coupon code
+  const addCoupon = async (newCouponData) => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/coupon/create-coupon",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newCouponData),
+        }
+      );
+
+      // Handle response and update state as needed
+    } catch (error) {
+      console.error("Error adding new coupon:", error);
+    }
+  };
+
+  // Function to update a coupon code
+  const updateCoupon = async (couponId, updatedCouponData) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/coupon/update-coupon/${couponId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedCouponData),
+        }
+      );
+    } catch (error) {
+      console.error("Error updating coupon:", error);
+    }
+  };
+
+  // Function to delete a coupon code
+  const deleteCoupon = async (couponId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/coupon/delete-coupon/${couponId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+    }
+  };
+
   useEffect(() => {
     fetchCourses();
     fetchChaptersForCourse();
     fetchQuizzesForCourse();
     fetchCertificates();
+    fetchAllCoupons();
   }, []);
 
   return (
@@ -384,6 +464,7 @@ const CourseProvider = ({ children }) => {
         loading,
         chapters,
         quiz,
+        coupons,
         fetchChaptersForCourse,
         fetchQuizzesForCourse,
         addCourse,
@@ -398,6 +479,11 @@ const CourseProvider = ({ children }) => {
         checkQuizResult,
         generateCertificate,
         fetchCertificates,
+        fetchAllCoupons,
+        addCoupon,
+
+        updateCoupon,
+        deleteCoupon,
       }}
     >
       {children}

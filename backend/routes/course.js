@@ -3,6 +3,7 @@ const router = express.Router();
 const fetchuser = require("../middleware/fetchuser");
 const Course = require("../models/Course");
 const Chapter = require("../models/Chapter");
+const User = require("../models/User");
 const { body, validationResult } = require("express-validator");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
@@ -16,8 +17,9 @@ cloudinary.config({
   api_secret: "3bMgYnOQfoPjd0E3aDNh_i5vp0A",
 });
 
+// Configure Multer for file upload
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 // ROUTE 1: Fetch All Courses - GET "/api/course/fetchallcourse"
 router.get("/fetchallcourse", async (req, res) => {
@@ -45,7 +47,7 @@ router.post(
   ],
   async (req, res) => {
     try {
-      const { CourseName, CoursePrice, CourseDisc } = req.body;
+      const { CourseName, CoursePrice, CourseDisc, CourseDiscHead } = req.body;
       let { CourseImg } = req.body;
 
       const errors = validationResult(req);
@@ -75,6 +77,9 @@ router.post(
         CourseName,
         CourseDisc,
         CoursePrice,
+        CourseDiscHead,
+        CourseRatings: [],
+        CourseUsers: [],
         user: req.user.id,
       });
       const savedCourse = await newCourse.save();
@@ -88,7 +93,7 @@ router.post(
 
 // ROUTE 3: Update an existing Course using: PUT "/api/course/updateCourse/:id". login required
 router.put("/updateCourse/:id", fetchuser, async (req, res) => {
-  const { CourseName, CoursePrice, CourseDisc } = req.body;
+  const { CourseName, CoursePrice, CourseDisc, CourseDiscHead } = req.body;
   let { CourseImg } = req.body;
   try {
     // Create a newCourse object
@@ -119,6 +124,9 @@ router.put("/updateCourse/:id", fetchuser, async (req, res) => {
     if (CourseDisc) {
       newCourse.CourseDisc = CourseDisc;
     }
+    if (CourseDiscHead) {
+      newCourse.CourseDiscHead = CourseDiscHead;
+    }
     if (CoursePrice) {
       newCourse.CoursePrice = CoursePrice;
     }
@@ -136,7 +144,7 @@ router.put("/updateCourse/:id", fetchuser, async (req, res) => {
     course = await Course.findByIdAndUpdate(
       req.params.id,
       { $set: newCourse },
-      { new: true }
+      { new: true, fields: { CourseRatings: 0, CourseUsers: 0 } }
     );
     res.json({ course });
   } catch (error) {
@@ -201,19 +209,18 @@ router.post(
   async (req, res) => {
     try {
       const { ChapterName, ChapterLength, courseId } = req.body;
-      const { name, type, size } = req.body;
 
-      // Check if the file was uploaded successfully and get the file path
-      const chapterVideoPath = req.file ? req.file.path : null;
+      // Check if the file was uploaded successfully
+      if (!req.file) {
+        return res.status(400).send("No file uploaded");
+      }
+
+      // Get the file path
+      const chapterVideoPath = req.file.path;
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
-      }
-
-      // Ensure that req.file exists before using it
-      if (!chapterVideoPath) {
-        return res.status(400).send("Missing required parameter - file");
       }
 
       // Check if the course exists and belongs to the user
@@ -229,8 +236,9 @@ router.post(
       const cloudinaryUploadResult = await cloudinary.uploader.upload(
         chapterVideoPath,
         {
+          folder: "Chapter Videos",
           resource_type: "video",
-          public_id: `chapter_videos/${uuidv4()}`,
+          public_id: `${ChapterName}`,
         }
       );
 
@@ -241,12 +249,7 @@ router.post(
         course: courseId,
         ChapterName,
         ChapterLength,
-        ChapterVideo: {
-          url: cloudinaryUploadResult.secure_url,
-          name: name,
-          type: type,
-          size: size,
-        },
+        ChapterVideo: cloudinaryUploadResult.secure_url,
       });
 
       const savedChapter = await chapter.save();
@@ -316,6 +319,74 @@ router.delete("/deleteChapter/:id", fetchuser, async (req, res) => {
 
     await Chapter.findByIdAndDelete(req.params.id);
     res.json({ Success: "Chapter has been deleted", Chapter: chapter });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// ROUTE 9: Rate a Course - POST "/api/course/rateCourse/:id". login required
+router.post("/rateCourse/:id", fetchuser, async (req, res) => {
+  try {
+    const { rating } = req.body;
+
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({ error: "Invalid rating value" });
+    }
+
+    const course = await Course.findById(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ error: "Course Not Found" });
+    }
+
+    // Check if the user has already rated this course
+    const userRating = course.CourseRatings.find(
+      (r) => r.user.toString() === req.user.id
+    );
+
+    if (userRating) {
+      return res
+        .status(400)
+        .json({ error: "You have already rated this course" });
+    }
+
+    course.CourseRatings.push({ user: req.user.id, rating });
+    await course.save();
+
+    res.json({ message: "Rating added successfully" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// ROUTE 10: Enroll in a Course - POST "/api/course/enrollCourse/:id". login required
+router.post("/enrollCourse/:id", fetchuser, async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    const course = await Course.findById(courseId);
+
+    if (!course) {
+      return res.status(404).json({ error: "Course Not Found" });
+    }
+
+    // Check if the user is already enrolled in this course
+    if (course.CourseUsers.includes(req.user.id)) {
+      return res
+        .status(400)
+        .json({ error: "You are already enrolled in this course" });
+    }
+
+    // Add the course to the user's enrolledCourses array
+    const user = await User.findById(req.user.id);
+    user.enrolledCourses.push(courseId);
+    await user.save();
+
+    course.CourseUsers.push(req.user.id);
+    await course.save();
+
+    res.json({ message: "Enrolled in the course successfully" });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Internal Server Error");

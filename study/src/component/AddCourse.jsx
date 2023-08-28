@@ -19,6 +19,7 @@ const AddCourse = () => {
   const [courseData, setCourseData] = useState({
     CourseName: "",
     CourseDisc: "",
+    CourseDiscHead: "",
     CoursePrice: "",
     courseImage: null,
   });
@@ -50,6 +51,7 @@ const AddCourse = () => {
       setCourseData({
         CourseName: courseToEdit.CourseName,
         CourseDisc: courseToEdit.CourseDisc,
+        CourseDiscHead: courseToEdit.CourseDiscHead,
         CoursePrice: courseToEdit.CoursePrice,
         CourseImg: courseToEdit.CourseImg,
       });
@@ -110,6 +112,7 @@ const AddCourse = () => {
     if (
       !courseData.CourseName ||
       !courseData.CourseDisc ||
+      !courseData.CourseDiscHead ||
       !courseData.CoursePrice
     ) {
       return console.log("Error");
@@ -131,6 +134,7 @@ const AddCourse = () => {
     setCourseData({
       CourseName: "",
       CourseDisc: "",
+      CourseDiscHead: "",
       CoursePrice: "",
       CourseImg: null,
     });
@@ -200,7 +204,7 @@ const AddCourse = () => {
         <form onSubmit={handleSubmit}>
           <div className="modal-overlay">
             <div className="add-course-modal">
-              {imagePreviewUrl && ( // Display the image preview
+              {imagePreviewUrl && (
                 <img
                   src={imagePreviewUrl}
                   alt="Course Preview"
@@ -226,6 +230,13 @@ const AddCourse = () => {
                 type="text"
                 name="CourseName"
                 value={courseData.CourseName}
+                onChange={handleInputChange}
+              />
+              <input
+                placeholder="disc Head"
+                type="text"
+                name="CourseDiscHead"
+                value={courseData.CourseDiscHead}
                 onChange={handleInputChange}
               />
               <input

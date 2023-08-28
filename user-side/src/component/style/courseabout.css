@@ -1,0 +1,90 @@
+.about-container {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(48, 48, 48);
+  color: azure;
+  padding: 50px 30px;
+}
+
+.about-course {
+  display: flex;
+  justify-content: end;
+}
+
+.about-course-info {
+  width: 23%;
+  background-color: white;
+  color: black;
+}
+
+.about-course-info img {
+  width: 100%;
+}
+
+.about-course-info h2 {
+  position: relative;
+  left: 5px;
+  font-size: medium;
+}
+.about-course-info button {
+  border: none;
+  background-color: blueviolet;
+  color: aqua;
+  width: 96%;
+  height: 30px;
+  cursor: pointer;
+  margin-left: 5px;
+  margin-bottom: 5px;
+  font-size: large;
+}
+.about-course-info button:hover {
+  background-color: rgb(169, 82, 250);
+}
+#add-cart {
+  background-color: aqua;
+  color: blueviolet;
+  outline: 1px solid blueviolet;
+}
+#add-cart:hover {
+  background-color: rgb(12, 240, 240);
+}
+
+.about-context {
+  position: absolute;
+}
+
+.disc-head {
+  width: 90%;
+}
+
+.disc-head h1 {
+  word-wrap: break-word;
+}
+
+.disc-head p {
+  word-wrap: break-word;
+}
+
+.about-rating {
+  display: flex;
+  align-items: center;
+  font-size: small;
+  color: rgb(197, 135, 255);
+}
+#users {
+  color: aqua;
+  margin-left: 5px;
+}
+
+.other-detils {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+#certi-p {
+  display: flex;
+  gap: 3px;
+}
+#certi {
+  width: 20px;
+}

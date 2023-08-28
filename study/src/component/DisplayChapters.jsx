@@ -9,7 +9,7 @@ function DisplayChapters({
   visibility,
   courseId,
 }) {
-  const { updateChapter, courses } = useContext(CourseContext);
+  const { updateChapter } = useContext(CourseContext);
   const [editChapterId, setEditChapterId] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [chapterData, setChapterData] = useState({

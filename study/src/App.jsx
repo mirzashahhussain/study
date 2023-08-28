@@ -9,6 +9,7 @@ import DisplayChapters from "./component/DisplayChapters";
 import Test from "./component/test";
 import QuizCard from "./component/QuizCard";
 import CertificateDisplay from "./component/CertificateDisplay";
+import CouponManagement from "./component/CouponManagement";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route exact path="/chcard" element={<ChapterCard />} />
           <Route exact path="/q" element={<QuizCard />} />
           <Route exact path="/certi" element={<CertificateDisplay />} />
+          <Route exact path="/coupon" element={<CouponManagement />} />
           <Route exact path="/test" element={<Test />} />
         </Routes>
       </BrowserRouter>

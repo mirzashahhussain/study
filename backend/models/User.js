@@ -3,18 +3,12 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-  firstName: {
+  fullName: {
     type: String,
     require: true,
   },
-  lastName: {
+  userImg: {
     type: String,
-    require: true,
-  },
-  username: {
-    type: String,
-    require: true,
-    unique: true,
   },
   email: {
     type: String,
@@ -32,6 +26,12 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  enrolledCourses: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "course",
+    },
+  ],
 });
 
 const User = mongoose.model("user", UserSchema);

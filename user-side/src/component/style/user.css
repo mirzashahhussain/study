@@ -1,0 +1,171 @@
+.user-container {
+  display: flex;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 5px;
+}
+
+.user-navbar {
+  position: absolute;
+  left: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  border-radius: 5px;
+  padding: 30px;
+  width: 15%;
+  height: 69vh;
+  background-color: rgb(48, 48, 252);
+  z-index: 2;
+  transition: left 0.9s ease;
+}
+
+.user-nav-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 5px;
+  gap: 5px;
+}
+
+.user-nav-link:hover {
+  background-image: linear-gradient(
+    to right,
+    rgba(154, 154, 248, 0) 0%,
+    rgb(154, 154, 248) 100%
+  );
+  background-size: 200% 100%;
+  transition: background 0.3s;
+  background-position: -100% 0;
+}
+
+nav ul {
+  color: aqua;
+  list-style: none;
+}
+
+nav a {
+  text-decoration: none;
+  color: #fff;
+}
+.user-copy {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  bottom: 0;
+  left: 5px;
+}
+.user-copy p {
+  font-size: smaller;
+  color: white;
+}
+.user-copy button {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  color: white;
+}
+
+.settings {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 69vh;
+}
+
+#user-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+#user-info div {
+  display: flex;
+  flex-direction: column;
+}
+#user-info p {
+  border-radius: 5px;
+  padding: 10px;
+  width: 200px;
+  background-color: rgb(240, 233, 233);
+}
+.circle-box {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  margin-right: 20px;
+}
+
+#change-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.uplodad-image {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.del-btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(255, 94, 94);
+  color: rgb(255, 255, 255);
+  font-weight: bolder;
+  height: 30px;
+}
+.save-btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(110, 94, 255);
+  color: rgb(255, 255, 255);
+  font-weight: bolder;
+  height: 30px;
+}
+
+.user-courses {
+  display: flex;
+  justify-content: space-between;
+  gap: 100px;
+}
+
+.analysis-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.analysis-box label {
+  position: relative;
+  bottom: 40px;
+}
+
+.user-enrolled-courses {
+  padding: 20px 50px 20px 50px;
+  outline: 1px solid blueviolet;
+  border-radius: 10px;
+  font-size: 3rem;
+  font-weight: bolder;
+}

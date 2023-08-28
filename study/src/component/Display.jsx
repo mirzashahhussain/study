@@ -69,7 +69,11 @@ const Display = () => {
           <>
             <DisplayChapters chapters={selectedCourseChapters} />
             <DisplayQuiz courseId={selectedCourseId} />
-            <button className="crtificate" onClick={downloadCertificate}>
+            <button
+              className="crtificate"
+              onClick={downloadCertificate}
+              disabled
+            >
               View Certificate
             </button>
           </>

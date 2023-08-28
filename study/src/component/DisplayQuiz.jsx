@@ -9,7 +9,6 @@ function DisplayQuiz({ courseId }) {
   const [quizResponses, setQuizResponses] = useState([]);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [quizResult, setQuizResult] = useState([]);
   const [totalMarks, setTotalMarks] = useState(0);
   const [studentMarks, setStudentMarks] = useState(0);

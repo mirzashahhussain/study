@@ -1,0 +1,70 @@
+.chapter-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.chapter-card:hover {
+  background-color: #e9e7e7;
+}
+
+.chapter-name {
+  font-size: 15px;
+  border-radius: 5px;
+}
+.chapter-length {
+  font-size: 14px;
+  color: #666;
+}
+
+.chapter-video {
+  width: 100%;
+  opacity: 0;
+  max-height: 0;
+  transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+}
+
+.stop-icon {
+  display: none;
+}
+
+.chapter-card.open .chapter-video {
+  opacity: 1;
+  max-height: 150px;
+}
+
+.chapter-card.open .chapter-length {
+  display: none;
+}
+
+.chapter-card.open .play-icon {
+  display: none;
+}
+.chapter-card.open .stop-icon {
+  display: contents;
+}
+
+.chapter-card.open .chapter-name {
+  padding: 10px;
+}
+
+.chapter-card-options button {
+  border: none;
+  color: white;
+  margin-left: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: auto 5px;
+}
+
+.chapter-card-options button:nth-child(1) {
+  background-color: rgb(123, 123, 230);
+}
+.chapter-card-options button:nth-child(2) {
+  background-color: rgb(194, 106, 106);
+}
+

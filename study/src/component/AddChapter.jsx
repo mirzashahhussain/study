@@ -3,16 +3,12 @@ import { CourseContext } from "../context/CourseContext";
 import "./style/addchapter.css";
 
 const AddChapter = ({ courseId }) => {
-  const { addChapter, chapters } = useContext(CourseContext);
+  const { addChapter } = useContext(CourseContext);
 
   const [chapterData, setChapterData] = useState({
     ChapterName: "",
     ChapterLength: "",
-    ChapterVideo: {
-      name: "",
-      type: "",
-      size: "",
-    },
+    ChapterVideo: null,
     courseId: courseId,
   });
 
@@ -29,10 +25,9 @@ const AddChapter = ({ courseId }) => {
 
     // Call the function to get video duration
     const videoDuration = await getVideoDuration(file);
-    // setChapterData({ ...chapterData, ChapterVideo: file });
     setChapterData({
       ...chapterData,
-      ChapterVideo: { file, name: file.name, type: file.type, size: file.size },
+      ChapterVideo: file,
       ChapterLength: videoDuration,
     });
   };
@@ -40,16 +35,12 @@ const AddChapter = ({ courseId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await addChapter(chapterData);
-    console.log(chapterData);
+    console.log("Add Chapter", chapterData);
     // Clear form fields after submitting
     setChapterData({
       ChapterName: "",
       ChapterLength: "",
-      ChapterVideo: {
-        name: "",
-        type: "",
-        size: "",
-      },
+      ChapterVideo: null,
       courseId: courseId,
     });
     setShowAddForm(false); // Hide the form after submitting
@@ -65,8 +56,8 @@ const AddChapter = ({ courseId }) => {
       const video = document.createElement("video");
       video.preload = "metadata";
       video.onloadedmetadata = function () {
-        URL.revokeObjectURL(video.src); // Revoke the object URL to free resources
-        const duration = video.duration; // duration in seconds
+        URL.revokeObjectURL(video.src);
+        const duration = video.duration;
         const minutes = Math.floor(duration / 60);
         const seconds = Math.floor(duration % 60);
         resolve(`${minutes} min ${seconds} sec`);
@@ -77,10 +68,6 @@ const AddChapter = ({ courseId }) => {
       video.src = URL.createObjectURL(file);
     });
   };
-
-  const filteredChapters = chapters.filter(
-    (chapter) => chapter.courseId === courseId
-  );
 
   return (
     <div>
