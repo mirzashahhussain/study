@@ -12,6 +12,7 @@ const CourseProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState(null);
   const [userImage, setUserImage] = useState(null);
+  const [courseRatings, setCourseRating] = useState([1,2,3,3,5]);
   let navigate = useNavigate();
 
   const loginUser = async (email, password) => {
@@ -153,7 +154,10 @@ const CourseProvider = ({ children }) => {
       );
 
       const coursesData = await coursesResponse.json();
+      console.log(coursesData);
       setCourses(coursesData);
+      setCourseRating(coursesData.CourseRatings);
+      console.log(courseRatings);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -313,7 +317,6 @@ const CourseProvider = ({ children }) => {
       );
 
       const data = await response.json();
-
       // You might want to fetch updated courses or update the courses state after rating
       fetchCourses();
       navigate("/home");
@@ -371,6 +374,7 @@ const CourseProvider = ({ children }) => {
         userId,
         userName,
         userImage,
+        courseRatings,
         loginUser,
         createUser,
         fetchUser,

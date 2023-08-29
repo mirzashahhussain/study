@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./style/payment.css";
 import { CourseContext } from "../context/CourseContext";
+import { useParams, useLocation } from "react-router-dom";
 
 function PaymentPage() {
   const { verifyCoupon } = useContext(CourseContext);
@@ -10,9 +11,18 @@ function PaymentPage() {
   const [couponSuccess, setCouponSuccess] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
   const courseRatings = [5, 4, 3, 4, 5];
-  const courseId = "64de3b0cfad66a03477744d6";
+  const { courseId } = useParams();
 
-  const coursePrice = 1000;
+  // Get location object to access query parameters
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+
+  // Extract additional course details from query parameters
+  const courseImg = queryParams.get("courseImg");
+  const courseName = queryParams.get("courseName");
+  const coursePrice = queryParams.get("coursePrice");
+
+  
   const couponDiscountPercentage = 15;
 
   const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -30,6 +40,7 @@ function PaymentPage() {
       setAverageRating(newAverageRating);
     }
   }, [courseRatings]);
+
 
   const applyCoupon = async () => {
     try {
@@ -90,14 +101,9 @@ function PaymentPage() {
       <div className="course-buy-container">
         <div className="course-buy">
           <div className="course-details">
-            <img
-              src={
-                "https://trisectinstitute.com/wp-content/uploads/2021/12/best-python-training.png"
-              }
-              alt="User"
-            />
+            <img src={courseImg} alt="User" />
             <div className="course-buy-details">
-              <h1>Python</h1>
+              <h1>{courseName}</h1>
               <div className="rating-buy">
                 {averageRating.toFixed(1) || 0}
                 {Array.from({ length: filledStars }, (_, index) => (

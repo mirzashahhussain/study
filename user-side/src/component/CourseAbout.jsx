@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import "./style/courseabout.css";
 import certificate from "../assets/certificate.png";
 import { CourseContext } from "../context/CourseContext";
+import { Link } from "react-router-dom";
 
 function CourseAbout(props) {
   const {
@@ -55,8 +56,10 @@ function CourseAbout(props) {
       );
       const newAverageRating = sumRatings / totalRatings;
       setAverageRating(newAverageRating);
+
     }
   }, [courseRatings]);
+
 
   const filledStars = Math.floor(averageRating);
   const hasHalfStar = averageRating % 1 !== 0;
@@ -69,15 +72,18 @@ function CourseAbout(props) {
             <h2>{truncatedText || "Hello"} </h2>
 
             {!userEnrolled && (
-              <button onClick={handleEnrollClick}>
+              <Link
+                to={{
+                  pathname: `/payment/${courseId}`,
+                  search: `?courseImg=${courseImg}&courseName=${courseName}&coursePrice=${coursePrice}`,
+                }}
+                onClick={handleEnrollClick}
+                className="payment-link"
+              >
                 {coursePrice || "FREE"}
-              </button>
+              </Link>
             )}
-            {userEnrolled && (
-              <button >
-                {"Viwe Course"}
-              </button>
-            )}
+            {userEnrolled && <button>{"Viwe Course"}</button>}
             <button id="add-cart">ADD TO CART</button>
           </div>
         </div>

@@ -21,7 +21,7 @@ function App() {
         <Route exact path="/certi" element={<CertificateDisplay />} />
         <Route exact path="/certi" element={<Home />} />
         <Route exact path="/course-about" element={<CourseAbout />} />
-        <Route exact path="/payment" element={<PaymentPage />} />
+        <Route exact path="/payment/:courseId" element={<PaymentPage />} />
         <Route exact path="/user" element={<User />} />
       </Routes>
     </>

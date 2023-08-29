@@ -81,7 +81,7 @@ const Display = () => {
                   courseDisc={course.CourseDisc}
                   courseName={course.CourseName}
                   coursePrice={course.CoursePrice}
-                  courseRatings={course.CourseRatings.rating}
+                  courseRatings={course.CourseRatings}
                   courseUserRatings={course.CourseRatings.length}
                   onClick={() => handleCourseClick(course._id)}
                 />
@@ -109,7 +109,7 @@ const Display = () => {
                   courseDisc={selectedCourse.CourseDisc}
                   courseDiscHead={selectedCourse.CourseDiscHead}
                   courseEnroll={selectedCourse.CourseUsers.length}
-                  courseRatings={selectedCourse.CourseRatings.rating}
+                  courseRatings={selectedCourse.CourseRatings}
                   courseUserRatings={selectedCourse.CourseRatings.length}
                 />
               )}
