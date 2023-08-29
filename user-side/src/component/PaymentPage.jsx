@@ -8,7 +8,7 @@ function PaymentPage() {
   const [appliedCoupons, setAppliedCoupons] = useState([]);
   const [couponError, setCouponError] = useState("");
   const [couponSuccess, setCouponSuccess] = useState(false);
-  const [averageRating, setAverageRating] = useState(2);
+  const [averageRating, setAverageRating] = useState(0);
   const courseRatings = [5, 4, 3, 4, 5];
   const courseId = "64de3b0cfad66a03477744d6";
 
@@ -89,54 +89,36 @@ function PaymentPage() {
     <>
       <div className="course-buy-container">
         <div className="course-buy">
-          <img
-            src={
-              "https://trisectinstitute.com/wp-content/uploads/2021/12/best-python-training.png"
-            }
-            alt="User"
-          />
-          <div className="course-buy-details">
-            <h1>Python</h1>
-            <div className="rating" style={{ marginTop: "5px" }}>
-              {averageRating.toFixed(1) || 0}
-              {Array.from({ length: filledStars }, (_, index) => (
-                <i key={index} className={`fa-solid fa-star filled`} />
-              ))}
-              {hasHalfStar && (
-                <i className="fa-solid fa-star-half-alt filled" />
-              )}
-              {Array.from(
-                {
-                  length: Math.floor(5 - (filledStars + (hasHalfStar ? 1 : 0))),
-                },
-                (_, index) => (
-                  <i key={index} className="fa-regular fa-star" />
-                )
-              )}
+          <div className="course-details">
+            <img
+              src={
+                "https://trisectinstitute.com/wp-content/uploads/2021/12/best-python-training.png"
+              }
+              alt="User"
+            />
+            <div className="course-buy-details">
+              <h1>Python</h1>
+              <div className="rating-buy">
+                {averageRating.toFixed(1) || 0}
+                {Array.from({ length: filledStars }, (_, index) => (
+                  <i key={index} className={`fa-solid fa-star filled`} />
+                ))}
+                {hasHalfStar && (
+                  <i className="fa-solid fa-star-half-alt filled" />
+                )}
+                {Array.from(
+                  {
+                    length: Math.floor(
+                      5 - (filledStars + (hasHalfStar ? 1 : 0))
+                    ),
+                  },
+                  (_, index) => (
+                    <i key={index} className="fa-regular fa-star" />
+                  )
+                )}
+              </div>
             </div>
           </div>
-          <div className="applied-coupons">
-            {appliedCoupons.map((appliedCoupon) => (
-              <div key={appliedCoupon} className="applied-coupon">
-                {appliedCoupon}
-                <button onClick={() => removeCoupon(appliedCoupon)}>
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
-          <input
-            type="text"
-            placeholder="Discount Coupon"
-            value={coupon}
-            onChange={(e) => setCoupon(e.target.value)}
-          />
-          <button onClick={applyCoupon}>Apply Coupon</button>
-          <button onClick={removeCoupon}>Remove Coupon</button>
-          {couponError && <p className="error-message">{couponError}</p>}
-          {couponSuccess && (
-            <p className="success-message">Coupon applied successfully!</p>
-          )}
 
           <table className="price-table">
             <tbody>
@@ -170,6 +152,29 @@ function PaymentPage() {
               </tr>
             </tbody>
           </table>
+          <div className="applied-coupons">
+            {appliedCoupons.map((appliedCoupon) => (
+              <div key={appliedCoupon} className="applied-coupon">
+                <button onClick={() => removeCoupon(appliedCoupon)}>
+                  {appliedCoupon}
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="coupon-input">
+            <input
+              type="text"
+              placeholder="Discount Coupon"
+              value={coupon}
+              onChange={(e) => setCoupon(e.target.value)}
+            />
+            <button onClick={applyCoupon}>Apply</button>
+          </div>
+          {couponError && <p className="error-message">{couponError}</p>}
+          {couponSuccess && (
+            <p className="success-message">Coupon applied successfully!</p>
+          )}
 
           <button>Buy</button>
         </div>

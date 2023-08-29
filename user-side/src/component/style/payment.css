@@ -8,6 +8,17 @@
   min-height: 100vh;
 }
 
+.course-details {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-buy {
+  color: blue;
+}
+
 .course-buy {
   background-color: #fff;
   padding: 20px;
@@ -87,4 +98,31 @@
   color: #008000;
   font-size: 14px;
   margin-top: 5px;
+}
+
+.applied-coupon button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: none;
+  width: 50%;
+  height: 3vh;
+  gap: 15px;
+}
+
+.coupon-input {
+  display: flex;
+  justify-content: space-around;
+}
+.coupon-input input{
+  height: 2vh;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.coupon-input button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20%;
+  height: 5vh;
 }
