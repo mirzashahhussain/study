@@ -22,7 +22,6 @@ function PaymentPage() {
   const courseName = queryParams.get("courseName");
   const coursePrice = queryParams.get("coursePrice");
 
-  
   const couponDiscountPercentage = 15;
 
   const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -41,7 +40,6 @@ function PaymentPage() {
     }
   }, [courseRatings]);
 
-
   const applyCoupon = async () => {
     try {
       if (appliedCoupons.includes(coupon)) {
@@ -51,7 +49,7 @@ function PaymentPage() {
         if (couponValidation.valid) {
           const couponDiscount = parseInt(couponValidation.discount);
           setAppliedCoupons([...appliedCoupons, coupon]);
-          // setCoupons([...coupons, coupon]);
+
           setCoupon("");
           applyDiscounts(appliedCoupons, coursePrice, couponDiscountPercentage);
           setCouponError("");

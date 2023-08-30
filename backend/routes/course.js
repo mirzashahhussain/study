@@ -21,6 +21,31 @@ cloudinary.config({
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// ROUTE 0: Search for Courses - GET "/api/course/search"
+router.get("/search", async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    // Search for courses using the query parameter
+    const courses = await Course.find({
+      $or: [
+        { CourseName: { $regex: `${query}`, $options: "i" } }, // Case-insensitive course name search
+      ],
+    });
+
+    const coursesWithSelectedDetails = courses.map((course) => ({
+      CourseName: course.CourseName,
+      CoursePrice: course.CoursePrice,
+      CourseImg: course.CourseImg,
+    }));
+
+    res.json(coursesWithSelectedDetails);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 // ROUTE 1: Fetch All Courses - GET "/api/course/fetchallcourse"
 router.get("/fetchallcourse", async (req, res) => {
   try {

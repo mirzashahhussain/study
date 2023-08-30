@@ -9,6 +9,7 @@ import "./style/display.css";
 import DisplayQuiz from "./DisplayQuiz";
 import CourseAbout from "./CourseAbout";
 import CourseRatings from "./CourseRating";
+import SearchComponent from "./SearchComponent";
 
 const Display = () => {
   const {
@@ -57,6 +58,8 @@ const Display = () => {
 
   return (
     <>
+      <SearchComponent handleCourseClick={handleCourseClick} />
+
       <div className="course-main">
         {loading ? (
           <>
@@ -110,6 +113,7 @@ const Display = () => {
                   courseDiscHead={selectedCourse.CourseDiscHead}
                   courseEnroll={selectedCourse.CourseUsers.length}
                   courseRatings={selectedCourse.CourseRatings}
+                  date={selectedCourse.date}
                   courseUserRatings={selectedCourse.CourseRatings.length}
                 />
               )}

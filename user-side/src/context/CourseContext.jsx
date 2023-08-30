@@ -12,7 +12,7 @@ const CourseProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState(null);
   const [userImage, setUserImage] = useState(null);
-  const [courseRatings, setCourseRating] = useState([1,2,3,3,5]);
+  const [courseRatings, setCourseRating] = useState([1, 2, 3, 3, 5]);
   let navigate = useNavigate();
 
   const loginUser = async (email, password) => {
@@ -137,6 +137,28 @@ const CourseProvider = ({ children }) => {
     } catch (error) {
       console.error("Error deleting user:", error);
       return { status: "FAILED", message: "An error occurred" };
+    }
+  };
+
+  // Function to search for courses
+  const searchCourses = async (query) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/course/search?query=${encodeURIComponent(
+          query
+        )}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const searchData = await response.json();
+      return searchData;
+    } catch (error) {
+      console.error("Error searching courses:", error);
+      return [];
     }
   };
 
@@ -388,6 +410,7 @@ const CourseProvider = ({ children }) => {
         enrollInCourse,
         rateCourse,
         verifyCoupon,
+        searchCourses,
       }}
     >
       {children}

@@ -14,6 +14,7 @@ function CourseAbout(props) {
     courseEnroll,
     courseRatings,
     courseUserRatings,
+    date,
   } = props;
 
   const maxWords = 5;
@@ -46,6 +47,13 @@ function CourseAbout(props) {
     }
   };
 
+  const dateObject = new Date(date);
+  const formattedDate = `${dateObject.getFullYear()}-${(
+    dateObject.getMonth() + 1
+  )
+    .toString()
+    .padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`;
+
   useEffect(() => {
     // Calculate the average rating if courseRatings is defined
     if (courseRatings && courseRatings.length > 0) {
@@ -56,10 +64,8 @@ function CourseAbout(props) {
       );
       const newAverageRating = sumRatings / totalRatings;
       setAverageRating(newAverageRating);
-
     }
   }, [courseRatings]);
-
 
   const filledStars = Math.floor(averageRating);
   const hasHalfStar = averageRating % 1 !== 0;
@@ -110,8 +116,8 @@ function CourseAbout(props) {
           </div>
           <div className="other-detils">
             <p>
-              <i className="fa-solid fa-circle-exclamation" /> Last updated
-              7/2023
+              <i className="fa-solid fa-circle-exclamation" /> Last updated{" "}
+              {formattedDate}
             </p>
             <p>
               <i className="fa-solid fa-globe" /> English

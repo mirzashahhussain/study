@@ -6,10 +6,10 @@ const AddChapter = ({ courseId }) => {
   const { addChapter } = useContext(CourseContext);
 
   const [chapterData, setChapterData] = useState({
+    courseId: courseId,
     ChapterName: "",
     ChapterLength: "",
     ChapterVideo: null,
-    courseId: courseId,
   });
 
   const [showAddForm, setShowAddForm] = useState(false);
