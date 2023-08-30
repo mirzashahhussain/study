@@ -26,8 +26,8 @@ const SearchComponent = ({ handleCourseClick }) => {
 
   const handleCourseClickWithReset = (courseId) => {
     handleCourseClick(courseId);
-    setSearchResults([]); 
-    setSearchQuery("")
+    setSearchResults([]);
+    setSearchQuery("");
   };
 
   return (
@@ -42,6 +42,8 @@ const SearchComponent = ({ handleCourseClick }) => {
         <div className="search-results">
           {loading ? (
             <p>Loading search results...</p>
+          ) : searchQuery && searchResults.length === 0 ? (
+            <p>Course not found.</p>
           ) : (
             searchResults.map((course) => (
               <div key={course._id} className="results">

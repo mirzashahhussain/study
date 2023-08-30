@@ -3,6 +3,7 @@
   right: 150px;
   display: flex;
   justify-content: center;
+  justify-content: center;
 }
 
 .search-component input {
@@ -14,12 +15,14 @@
   grid-template-columns: repeat(auto-fit, 250px);
   justify-content: center;
   align-items: center;
-  grid-gap: 0px;
+}
+.search-results p {
+  padding: 5px;
+  background-color: aqua;
 }
 
 .results {
   padding-right: 10px;
   background-color: white;
-
   z-index: 9;
 }
